@@ -1,0 +1,12 @@
+{
+  "domain": "octopus_cosy_emoncms",
+  "name": "Octopus Cosy to Emoncms",
+  "version": "1.0.0",
+  "codeowners": ["@swwilshub"],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/swwilshub/cosy-to-emoncms",
+  "integration_type": "service",
+  "iot_class": "cloud_push",
+  "requirements": []
+}

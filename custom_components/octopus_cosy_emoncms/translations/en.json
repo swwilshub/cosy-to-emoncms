@@ -1,0 +1,41 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Set up Octopus Cosy to Emoncms",
+        "description": "Configure the connection to your Emoncms instance and select which heat pump sensors to send.",
+        "data": {
+          "emoncms_url": "Emoncms URL",
+          "api_key": "Emoncms API Key",
+          "node_name": "Node Name",
+          "entities": "Heat Pump Sensors to Send",
+          "scan_interval": "Update Interval (seconds)"
+        },
+        "data_description": {
+          "node_name": "Choose a unique name for your Emoncms node. Examples: octopus_hp, ha_heatpump, cosy_api. Avoid: heatpump, EmonPi2 (reserved for hardware).",
+          "entities": "Select entities to send. Names will be cleaned (lowercase, underscores). Climate/water_heater entities auto-expand (e.g., 'Heating Zone 1' → heating_zone_1_cur_t, heating_zone_1_target_t). Check logs to see exact field names."
+        }
+      }
+    },
+    "error": {
+      "api_key_required": "API key is required",
+      "url_required": "Emoncms URL is required",
+      "node_name_required": "Node name is required"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Configure Octopus Cosy to Emoncms",
+        "description": "Update which sensors to send and the update interval.\n\n**Entity naming:**\nClimate/water_heater entities auto-expand into multiple Emoncms fields (cur_t, target_t, hvac_act, etc.). Check logs to see exact field names.",
+        "data": {
+          "entities": "Heat Pump Sensors to Send",
+          "scan_interval": "Update Interval (seconds)"
+        },
+        "data_description": {
+          "entities": "Climate entities will be split into multiple fields automatically"
+        }
+      }
+    }
+  }
+}

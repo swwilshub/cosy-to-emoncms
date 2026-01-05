@@ -1,0 +1,5 @@
+{
+  "name": "Octopus Cosy to Emoncms",
+  "render_readme": true,
+  "homeassistant": "2024.1.0"
+}
