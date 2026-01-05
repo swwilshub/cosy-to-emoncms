@@ -2,6 +2,7 @@
 import logging
 from typing import Any
 
+import aiohttp
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.core import callback
@@ -33,6 +34,28 @@ from .coordinator import OctopusCosyEmoncmsCoordinator
 _LOGGER = logging.getLogger(__name__)
 
 
+async def validate_api_key(emoncms_url: str, api_key: str) -> bool:
+    """Validate the Emoncms API key by making a test request."""
+    url = f"{emoncms_url.rstrip('/')}/input/post"
+    params = {
+        "node": "test",
+        "fulljson": "{}",
+        "apikey": api_key,
+    }
+
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, params=params, timeout=aiohttp.ClientTimeout(total=10)) as response:
+                if response.status == 200:
+                    text = await response.text()
+                    # Emoncms returns "ok" for valid API key
+                    return "ok" in text.lower()
+                return False
+    except Exception as err:
+        _LOGGER.error("Error validating API key: %s", err)
+        return False
+
+
 class OctopusCosyEmoncmsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for Octopus Cosy to Emoncms."""
 
@@ -49,7 +72,7 @@ class OctopusCosyEmoncmsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         errors = {}
 
         if user_input is not None:
-            # Validate the API key and URL
+            # Validate required fields
             if not user_input.get(CONF_API_KEY):
                 errors[CONF_API_KEY] = "api_key_required"
             elif not user_input.get(CONF_EMONCMS_URL):
@@ -57,11 +80,20 @@ class OctopusCosyEmoncmsConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             elif not user_input.get(CONF_NODE_NAME):
                 errors[CONF_NODE_NAME] = "node_name_required"
             else:
-                # Create entry directly
-                return self.async_create_entry(
-                    title=f"Emoncms: {user_input[CONF_NODE_NAME]}",
-                    data=user_input,
+                # Validate API key by testing it
+                is_valid = await validate_api_key(
+                    user_input[CONF_EMONCMS_URL],
+                    user_input[CONF_API_KEY]
                 )
+
+                if not is_valid:
+                    errors[CONF_API_KEY] = "invalid_api_key"
+                else:
+                    # Create entry
+                    return self.async_create_entry(
+                        title=f"Emoncms: {user_input[CONF_NODE_NAME]}",
+                        data=user_input,
+                    )
 
         # Show the form
         data_schema = vol.Schema(

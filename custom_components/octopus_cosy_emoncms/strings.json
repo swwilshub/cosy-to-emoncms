@@ -20,7 +20,8 @@
     "error": {
       "api_key_required": "API key is required",
       "url_required": "Emoncms URL is required",
-      "node_name_required": "Node name is required"
+      "node_name_required": "Node name is required",
+      "invalid_api_key": "Invalid API key. Please check your Emoncms API key (should be the write key, not read key)"
     }
   },
   "options": {
